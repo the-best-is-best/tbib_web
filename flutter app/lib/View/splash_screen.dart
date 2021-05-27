@@ -1,6 +1,29 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import '../models/header_content.dart';
+
+fetchData() async {
+    var url = Uri.parse('http://localhost/tbib_web/header_content/get_data.php');
+
+  try{
+     await http.get(url);
+  }catch(ex){
+    return;
+  }
+  var response =  await http.get(url);
+  if (response.statusCode == 201) {
+    var obj = json.decode(response.body);
+    HeaderContent.bg = obj['data']['bg'];
+    HeaderContent.btnActive = obj['data']['btn_active'];
+    HeaderContent.btnTitle = obj['data']['btn_title'];
+    HeaderContent.content = obj['data']['content'].split('/n');
+    HeaderContent.des = obj['data']['des'];
+    HeaderContent.title = obj['data']['title'];
+  }
+ 
+}
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -10,7 +33,8 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-     Timer(Duration(seconds: 5),
+    fetchData();
+    Timer(Duration(seconds: 5),
         () => Navigator.pushReplacementNamed(context, '/home'));
     super.initState();
   }
